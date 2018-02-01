@@ -34,6 +34,49 @@ use PHPMailerAutoload;
 use PHPMailer;
 
 class IndexController extends Controller {
+    
+    public function GenaratePageDataLimit($limit='')
+    {
+        if(!session::has('pagination_limit') && empty($limit))
+        {
+            session::put('pagination_limit',9);
+        }
+        elseif(!session::has('pagination_limit') && !empty($limit))
+        {
+            session::put('pagination_limit',$limit);
+        }
+        elseif(session::has('pagination_limit') && !empty($limit))
+        {
+            session::put('pagination_limit',$limit);
+        }
+
+        $newLimit=session::get('pagination_limit')?session::get('pagination_limit'):$limit;
+
+        return $newLimit;
+    }
+
+    public function GenaratePageDataFilter($filter='')
+    {
+        if(!session::has('filter') && empty($filter))
+        {
+            session::put('filter','id-desc');
+        }
+        elseif(!session::has('filter') && !empty($filter))
+        {
+            session::put('filter',$filter);
+        }
+        elseif(session::has('filter') && !empty($filter))
+        {
+            session::put('filter',$filter);
+        }
+
+        $filterData=session::get('filter')?session::get('filter'):'id-desc';
+       
+
+        return $filterData;
+
+    }
+
 
     /**
      * Display a listing of the resource.
@@ -567,16 +610,26 @@ class IndexController extends Controller {
         $cat_info = category::find($cid);
 
         //echo $cat_info->layout; die();
-
+        $filter=$this->GenaratePageDataFilter();
         if ($layout_id == 1) {
-
+            
             $product = DB::table('products')
                     ->select('products.*')
                     ->where('products.cid', $cid)
                     ->where('products.bid', $bid)
                     ->where('products.scid', 0)
                     ->where('products.sscid', 0)
-                    ->get();
+                    ->when($filter, function($query) use ($filter){
+                        if($filter=='id-desc'){ return $query->orderby('id','desc'); }
+                        elseif($filter=='price:asc'){ return $query->orderby('price','asc'); }
+                        elseif($filter=='price:desc'){ return $query->orderby('price','desc'); }
+                        elseif($filter=='name:asc'){ return $query->orderby('name','asc'); }
+                        elseif($filter=='name:desc'){ return $query->orderby('name','desc'); }
+                        elseif($filter=='quantity:desc'){ return $query->orderby('quantity','desc'); }
+                        elseif($filter=='position:asc'){ return $query->orderby('id','desc'); }
+                        else{ return $query->orderby('id','desc'); }                    
+                    })
+                    ->paginate($this->GenaratePageDataLimit());
 
         }elseif ($layout_id == 2) {
 
@@ -698,12 +751,15 @@ class IndexController extends Controller {
         ]);
     }
 
-    public function catsubcategoryPage($cid = 0, $sub_cat_id = 0, $name = '') {
+    public function catsubcategoryPage($cid = 0, $sub_cat_id = 0, $name = '', $sname = '') {
 
         $language = Language::all();
         $currency = Currency::all();
 
-
+        if(!empty($sname))
+        {
+            $name .='/'.$sname;
+        }
 
         $cs = CustomerSupport::all();
         $cde = ContactDetail::all();
@@ -714,7 +770,22 @@ class IndexController extends Controller {
         $seo = Seo::all();
         $product = Product::all();
         $cat_info = SubCategory::find($sub_cat_id);
-        $product_info = Product::where('scid', $sub_cat_id)->where('parent_product', '0')->get();
+        $filter=$this->GenaratePageDataFilter();
+        $product_info = Product::where('scid', $sub_cat_id)
+                        ->where('parent_product', '0')
+                        ->when($filter, function($query) use ($filter){
+                            if($filter=='id-desc'){ return $query->orderby('id','desc'); }
+                            elseif($filter=='price:asc'){ return $query->orderby('price','asc'); }
+                            elseif($filter=='price:desc'){ return $query->orderby('price','desc'); }
+                            elseif($filter=='name:asc'){ return $query->orderby('name','asc'); }
+                            elseif($filter=='name:desc'){ return $query->orderby('name','desc'); }
+                            elseif($filter=='quantity:desc'){ return $query->orderby('quantity','desc'); }
+                            elseif($filter=='position:asc'){ return $query->orderby('id','desc'); }
+                            else{ return $query->orderby('id','desc'); }                    
+                        })
+                        ->paginate($this->GenaratePageDataLimit());
+
+                        
         $sub_catinfo = DB::table('sub_categories as sc')
                 ->leftjoin('categories as c', 'c.id', '=', 'sc.category_id')
                 ->select(DB::raw('c.banner,c.description,sc.*'))
@@ -960,25 +1031,39 @@ class IndexController extends Controller {
 
     public function CategorybrandSubCategoryPage($cid, $bid, $id, $name) {
 
+        
+
         $language = Language::all();
         $currency = Currency::all();
-
         $cs = CustomerSupport::all();
         $cde = ContactDetail::all();
-
         $cat = category::take(2)->get();
         $cats = category::all();
         $brn = Brand::all();
         $seo = Seo::all();
-        //$product = Product::where('bid', $cid)->get();
         $cat_info = SubCategory::find($cid);
+
+        $filter=$this->GenaratePageDataFilter();
         $product_info = DB::table('products')
                 ->where('bid', $bid)
                 ->where('cid', $cid)
                 ->where('scid', $id)
                 ->where('multi_product', 0)
                 ->select('products.*')
-                ->get();
+                ->when($filter, function($query) use ($filter){
+                    if($filter=='id-desc'){ return $query->orderby('id','desc'); }
+                    elseif($filter=='price:asc'){ return $query->orderby('price','asc'); }
+                    elseif($filter=='price:desc'){ return $query->orderby('price','desc'); }
+                    elseif($filter=='name:asc'){ return $query->orderby('name','asc'); }
+                    elseif($filter=='name:desc'){ return $query->orderby('name','desc'); }
+                    elseif($filter=='quantity:desc'){ return $query->orderby('quantity','desc'); }
+                    elseif($filter=='position:asc'){ return $query->orderby('id','desc'); }
+                    else{ return $query->orderby('id','desc'); }                    
+                })
+                ->paginate($this->GenaratePageDataLimit());
+        //@include('front-include.pagination') for view
+                //$filter=$this->GenaratePageDataFilter();
+        //$this->GenaratePageDataLimit() pagination param here     
 
         $sub_catinfo = DB::table('sub_categories as sc')
                 ->join('categories as c', 'c.id', '=', 'sc.category_id')
@@ -987,10 +1072,7 @@ class IndexController extends Controller {
                 ->take(1)
                 ->get();
 
-        //echo "<pre>";
-        //print_r($sub_catinfo);
-        //exit();
-
+      
         $sqlSubcategory = DB::table('products')
                 ->join('sub_categories', 'products.scid', '=', 'sub_categories.id')
                 ->where('cid', $cid)
@@ -999,6 +1081,7 @@ class IndexController extends Controller {
                 ->groupBy('sub_categories.id')
                 ->get();
 
+        
         if (empty($product_info)) {
             $product_info = array();
         }
@@ -1029,7 +1112,7 @@ class IndexController extends Controller {
             'cat' => $cat,
             'brn' => $brn,
             'cats' => $cats,
-            //'product' => $product,
+            //'SubcategoryPaginate' => $sqlSubcategoryPaginate,
             'relSub' => $sqlSubcategory,
             'products' => $cart->items,
             'totalQty' => $cart->totalQty,
@@ -1053,6 +1136,8 @@ class IndexController extends Controller {
         $seo = Seo::all();
         //$product = Product::where('bid', $cid)->get();
         $cat_info = SubCategory::find($cid);
+
+        $filter=$this->GenaratePageDataFilter();
         $product_info = DB::table('products')
                 ->where('bid', $bid)
                 ->where('cid', $cid)
@@ -1060,7 +1145,20 @@ class IndexController extends Controller {
                 ->where('sscid', $sub_sub_cid)
                 ->where('multi_product', 0)
                 ->select('products.*')
-                ->get();
+                ->when($filter, function($query) use ($filter){
+                    if($filter=='id-desc'){ return $query->orderby('id','desc'); }
+                    elseif($filter=='price:asc'){ return $query->orderby('price','asc'); }
+                    elseif($filter=='price:desc'){ return $query->orderby('price','desc'); }
+                    elseif($filter=='name:asc'){ return $query->orderby('name','asc'); }
+                    elseif($filter=='name:desc'){ return $query->orderby('name','desc'); }
+                    elseif($filter=='quantity:desc'){ return $query->orderby('quantity','desc'); }
+                    elseif($filter=='position:asc'){ return $query->orderby('id','desc'); }
+                    else{ return $query->orderby('id','desc'); }                    
+                })
+                ->paginate($this->GenaratePageDataLimit());
+
+
+
 
         $sub_catinfo = DB::table('sub_categories as sc')
                 ->join('categories as c', 'c.id', '=', 'sc.category_id')

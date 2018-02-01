@@ -277,7 +277,7 @@ $brandAll=$arrayDD['brn'];
                 <div class="field-search">
                     <form method="post" action="{{url('search')}}" id="searchbox">
                         <div class="input-group-btn search_filter form-group">
-                            <select name="category_filter" id="category_filter" class="form-control">
+                            <select onchange="CategoryWiseRedirect(this.value)" name="category_filter" id="category_filter" class="form-control">
                                 <option value="0" selected="selected">Select A Category</option>
                                 @foreach($cats as $ct)
                                 <option value="C{{$ct->id}}">{{$ct->name}}</option>

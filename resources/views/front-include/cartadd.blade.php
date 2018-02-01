@@ -1,3 +1,7 @@
+<?php 
+$arrayDD=MenuPageController::siteBasic();
+$arrayCurrency=MenuPageController::CurrencyDetail();
+?>
 <script>
 
     var CUSTOMIZE_TEXTFIELD = 1;

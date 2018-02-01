@@ -45,6 +45,8 @@ Route::post('/shopping-cart/{reur}','IndexController@proceedPayment');
 Route::get('/checkout-cart/{status}/{token}','IndexController@completeCheckout');
 Route::get('/cart/{pid}/{pr}','IndexController@cartProductRemove');
 Route::get('/cartrow/{pid}/{reur}','IndexController@cartProductRemoveUrl');
+Route::get('/default/page/limit/{limit}','IndexController@GenaratePageDataLimit');
+Route::get('/default/page/filter/{filter}','IndexController@GenaratePageDataFilter');
 
 Route::get('/user-dashboard','IndexController@userDashboard');
 //Route::get('/wish-list','IndexController@wishList');
@@ -69,8 +71,6 @@ Route::post('/search','searchController@locateSearch');
 Route::get('/search/{cat}/{search}','searchController@searchProduct');
 Route::get('/search/{cat}/{search}/{limit}/{curpage}','searchController@searchProduct');
 Route::get('/search/{cat}/{search}/{limit}/{curpage}/{orderby}','searchController@searchProduct');
-
-
 
 
 Route::get('/add-to-cart/{id}/{reur}',[
@@ -116,6 +116,7 @@ Route::get('contact-us','IndexController@contactUS');
 Route::post('contact-us','IndexController@postContactUS');
 Route::get('/sub-category/{id}/{name}','IndexController@subcategoryPage');
 Route::get('/product/sub/{cid}/{sub_cat_id}/{name}','IndexController@catsubcategoryPage');
+Route::get('/product/sub/{cid}/{sub_cat_id}/{name}/{sname}','IndexController@catsubcategoryPage');
 Route::get('/brand/{id}/{name}','IndexController@brandPage');
 Route::get('/category/brand/{id}/{cid}/{name}','IndexController@CategorybrandPage');
 Route::get('/category/{cid}/brand/{bid}/extra/sub/{sub_cid}/{name}','IndexController@CategorybrandextraSubPage');
@@ -123,6 +124,7 @@ Route::get('/pro-category/{cid}/brand/{bid}/{name}','IndexController@ProCategory
 Route::get('/category/{cid}/brand/{bid}/sub/{sub_cid}/extra/{sub_sub_cid}/{name}','IndexController@ProCategorybrandextrasubPage'); //lavel 4 cate / brand /to
 Route::get('/category/brand/sub/{cid}/{bid}/{sub_cid}/{name}','IndexController@CategorybrandSubPage');
 Route::get('/category/{cid}/brand/{bid}/sub/{id}/{name}','IndexController@CategorybrandSubCategoryPage');
+Route::get('/category/{cid}/brand/{bid}/sub/{id}/{name}/{returnType}','IndexController@CategorybrandSubCategoryPage');
 //all product after c->b->p
 //Route::get('/category/{cid}/brand/all/product/{bid}/{name}','IndexController@CategorybrandAllProductPage');
 Route::get('/category/brand/sub/sub/{cid}/{bid}/{sub_id}/{sub_sub_id}/{name}','IndexController@CategorybrandSubSubCategoryPage');

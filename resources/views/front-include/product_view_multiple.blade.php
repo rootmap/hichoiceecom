@@ -115,7 +115,7 @@
                                     </div>
                                     @endif 
                                     <div class="cell staticParent" style="line-height: 100%;">
-                                        <input class="form-control child" style="width: 100px; margin-bottom:-15px; font-size: 15px; padding-bottom: 0px; font-weight: bold;" value="0" name="qty_child_{{$rp->id}}" type="number">
+                                        <input class="form-control child" style="width: 100px; margin-bottom:-15px; font-size: 15px; padding-bottom: 0px; font-weight: bold;" value="1" name="qty_child_{{$rp->id}}" type="number">
                                     </div>
                                     <div class="cell">
                                         <button style="margin-top: 5px;"

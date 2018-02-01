@@ -32,7 +32,7 @@
                             </thead>
                             <tfoot>
                                 <tr class="cart_total_price">
-                                    <td rowspan="4" colspan="3" id="cart_voucher" class="cart_voucher">
+                                    <td rowspan="6" colspan="3" id="cart_voucher" class="cart_voucher">
                                         <p class="cart_navigation">
                                             <a href="{{url('home')}}" class="button-exclusive btn btn-default" title="Continue shopping"> <i class="icon-chevron-left"></i>Continue shopping </a>
                                         </p>
@@ -44,16 +44,29 @@
                                     <td colspan="3" class="text-right"> Total gift-wrapping cost</td>
                                     <td colspan="2" class="price-discount price" id="total_wrapping"> {{$arrayCurrency->icon}}0.00</td>
                                 </tr>
+
+                                <?php 
+                                $vat=($totalPrice*20)/100;
+                                ?>
+
                                 @if($totalPrice<150)
-                                <tr class="cart_total_delivery">
-                                    <td colspan="3" class="text-right">Extra Charge</td>
-                                    <td colspan="2" class="price" id="total_shipping">{{$arrayCurrency->icon}}9.95</td>
-                                </tr>
-                                <?php $totalPrice+=9.95; ?>
+                                    <tr class="cart_total_delivery">
+                                        <td colspan="3" class="text-right">Extra Charge</td>
+                                        <td colspan="2" class="price" id="total_shipping">{{$arrayCurrency->icon}}9.95</td>
+                                    </tr>
+                                    <?php $totalPrice+=9.95; ?>
                                 @endif
+                                
                                 <tr class="cart_total_delivery">
                                     <td colspan="3" class="text-right">Total shipping</td>
                                     <td colspan="2" class="price" id="total_shipping">{{$arrayCurrency->icon}}0.00</td>
+                                </tr>
+
+                                <?php $totalPrice+=$vat; ?>
+
+                                <tr class="cart_total_delivery">
+                                    <td colspan="3" class="text-right">Total Vat</td>
+                                    <td colspan="2" class="price" id="total_shipping">{{$arrayCurrency->icon}}{{$vat}}</td>
                                 </tr>
 
                                 <tr class="cart_total_voucher unvisible">
@@ -827,8 +840,7 @@
         $(".zoomContainer").remove();
         applyElevateZoom();
     }
-    ;
-    ;
+    
     var input = $("#search_query_top");
     $('document').ready(function () {
         var width_ac_results = input.outerWidth();

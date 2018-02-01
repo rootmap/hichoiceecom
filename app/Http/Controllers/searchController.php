@@ -30,6 +30,48 @@ class searchController extends Controller {
         }
     }
 
+        public function GenaratePageDataLimit($limit='')
+    {
+        if(!session::has('pagination_limit') && empty($limit))
+        {
+            session::put('pagination_limit',9);
+        }
+        elseif(!session::has('pagination_limit') && !empty($limit))
+        {
+            session::put('pagination_limit',$limit);
+        }
+        elseif(session::has('pagination_limit') && !empty($limit))
+        {
+            session::put('pagination_limit',$limit);
+        }
+
+        $newLimit=session::get('pagination_limit')?session::get('pagination_limit'):$limit;
+
+        return $newLimit;
+    }
+
+    public function GenaratePageDataFilter($filter='')
+    {
+        if(!session::has('filter') && empty($filter))
+        {
+            session::put('filter','id-desc');
+        }
+        elseif(!session::has('filter') && !empty($filter))
+        {
+            session::put('filter',$filter);
+        }
+        elseif(session::has('filter') && !empty($filter))
+        {
+            session::put('filter',$filter);
+        }
+
+        $filterData=session::get('filter')?session::get('filter'):'id-desc';
+       
+
+        return $filterData;
+
+    }
+
     public function searchProduct($catpage = 0, $search = '', $limit = 9, $curpage = 1,$orderby="price:desc",$param1='',$param2='',$param3='',$param4='',$param5='',$param6='') {
         $language = Language::all();
         $currency = Currency::all();
@@ -40,31 +82,31 @@ class searchController extends Controller {
         $brn = Brand::all();
         $seo = Seo::all();
         $product = Product::all();
-        
-        $product_info = Product::where('name', 'LIKE', '%' . $search . '%')->get();
-        $orderarray= explode(":",$orderby);
+        $filter=$this->GenaratePageDataFilter();
+        $searchfound = Product::where('name', 'LIKE', '%' . $search . '%')->count();
+        $product_info = Product::where('name', 'LIKE', '%' . $search . '%')
+                        ->when($filter, function($query) use ($filter){
+                            if($filter=='id-desc'){ return $query->orderby('id','desc'); }
+                            elseif($filter=='price:asc'){ return $query->orderby('price','asc'); }
+                            elseif($filter=='price:desc'){ return $query->orderby('price','desc'); }
+                            elseif($filter=='name:asc'){ return $query->orderby('name','asc'); }
+                            elseif($filter=='name:desc'){ return $query->orderby('name','desc'); }
+                            elseif($filter=='quantity:desc'){ return $query->orderby('quantity','desc'); }
+                            elseif($filter=='position:asc'){ return $query->orderby('id','desc'); }
+                            else{ return $query->orderby('id','desc'); }                    
+                        })
+                        ->paginate($this->GenaratePageDataLimit());
+        $orderarray= 0;
         //print_r($orderarray);
         //exit();
-        $genskip=(($curpage-1)*$limit);
-        $product_infoget = Product::where('name', 'LIKE', '%' . $search . '%')
-                                ->orderBy($orderarray[0],$orderarray[1])
-                                ->take($limit)
-                                ->skip($genskip)
-                                ->get();
+        $genskip=0;
         
-        $totalpro =count($product_info);
+        $product_infoget = '';
         
-        $pagedeviner=floor($totalpro/$limit);
-        $genfric=$pagedeviner*$limit;
-        $fric=$totalpro-$genfric;
-        if(!empty($fric))
-        {
-            $pagedeviner+=1;
-        }
-        else
-        {
-            $pagedeviner=1;
-        }
+        $totalpro =$searchfound;
+        
+        $pagedeviner=0;
+       
         
         $oldCart = Session::get('cart');
         $cart = new Cart($oldCart);
@@ -84,11 +126,11 @@ class searchController extends Controller {
             'brand' => '',
             'cat' => $cat,
             'cats' => $cats,
-            'product' => $product,
+            'product' => $totalpro,
             'product_info' => $product_info,
-            'product_info_fetch' => $product_infoget,
+            'product_info_fetch' => $product_info,
             'urlst' => $urlst,
-            'pagination' => $pagedeviner,
+            'pagination' => $product_info,
             'curpage' =>$curpage,
             'limit' =>$limit,
             'ord'=>$orderarray,
