@@ -2,14 +2,6 @@
 <div id="center_column" class="center_column col-xs-12 col-sm-12 col-md-9">
     <div class="content_scene_cat">
         <h1 class="page-heading title_font">{{$scatname}}</h1>
-        <?php /*<div class="content_scene_cat_bg"  style="background:url('<?=url('/upload/category/'.$pagedata->photo)?>') right center no-repeat; background-size:cover; min-height:270px !important; max-height: 300px !important;">
-            <div class="cat_desc"> 
-                <span class="category-name title_font"> {{$pagedata->name}}</span>
-                <div class="rte">
-                    <p>{{$pagedata->description}} </p>
-                </div>
-            </div>
-        </div> */ ?>
     </div>
     <h1 class="page-heading product-listing title_font"><span class="cat-name">Shop&nbsp;</span><span class="heading-counter">There are <?php count($product)?> products..</span></h1>
     @include('front-include.pagination')
@@ -20,7 +12,6 @@
     @endif
     <div class=" hide-color-options hide-stock-info">
         <ul class="product_list grid row">
-
             @if(isset($product))
             @foreach($product as $pro)
             <li class="ajax_block_product col-xs-12 col-sm-6 col-lg-4 first-in-line first-item-of-tablet-line first-item-of-mobile-line">

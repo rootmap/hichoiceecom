@@ -137,7 +137,9 @@ Route::get('/product/{id}/{name}/{nn}/{kk}','IndexController@productPage');
 Route::get('/cart-new-add/{pid}/{quantity}','IndexController@cartAddFromProduct');
 //Route::get('/cart-new-add/{pid}/{quantity}/{unit}/{color}','IndexController@cartAddFromProduct');
 Route::get('/cart-new-add/{pid}/{quantity}/{unit}/{color}','IndexController@cartAddFromProductCustom');
-Route::get('/cart-new-Color-add/{pid}/{quantity}/{color}','IndexController@cartAddFromProductCustomWU');
+Route::get('/cart-new-Color-add/{pid}/{quantity}/{color}','IndexController@cartAddFromProductCustomWC');
+Route::get('/cart-new-del/{pid}/{quantity}','IndexController@getDelToCart');
+Route::get('/cart-new-unit-add/{pid}/{quantity}/{unit}','IndexController@cartAddFromProductCustomWU');
 Route::get('/cart-new-Color-add/{pid}/{quantity}','IndexController@cartAddFromProduct');
 Route::post('/save-cart-info','IndexController@savecart');
 

@@ -38,7 +38,7 @@
                                         </p>
                                     </td>
                                     <td colspan="3" class="text-right">Total products</td>
-                                    <td colspan="2" class="price" id="total_product">{{$arrayCurrency->icon}}{{$totalPrice}}</td>
+                                    <td colspan="2" class="price" id="total_product">{{$arrayCurrency->icon}}<span id="shoppingCartRawTotal">{{$totalPrice}}</span></td>
                                 </tr>
                                 <tr style="display: none;">
                                     <td colspan="3" class="text-right"> Total gift-wrapping cost</td>
@@ -49,24 +49,27 @@
                                 $vat=($totalPrice*20)/100;
                                 ?>
 
-                                @if($totalPrice<150)
-                                    <tr class="cart_total_delivery">
-                                        <td colspan="3" class="text-right">Extra Charge</td>
-                                        <td colspan="2" class="price" id="total_shipping">{{$arrayCurrency->icon}}9.95</td>
-                                    </tr>
-                                    <?php $totalPrice+=9.95; ?>
-                                @endif
                                 
-                                <tr class="cart_total_delivery">
-                                    <td colspan="3" class="text-right">Total shipping</td>
-                                    <td colspan="2" class="price" id="total_shipping">{{$arrayCurrency->icon}}0.00</td>
-                                </tr>
+                                    <tr class="cart_total_delivery" id="underTotalcost_delivery">
+                                        <td colspan="3" class="text-right">Extra Shipping Charge</td>
+                                        <td colspan="2" class="price" id="total_shipping">
+                                            {{$arrayCurrency->icon}}<span id="extraShippingCharge"><?php 
+                                            if($totalPrice<150)
+                                            {
+                                                echo 9.95;
+                                            }
+                                            
+                                            $totalPrice+=9.95; 
+                                            ?></span>
+                                            
+                                    </td>
+                                    </tr>
 
                                 <?php $totalPrice+=$vat; ?>
 
                                 <tr class="cart_total_delivery">
                                     <td colspan="3" class="text-right">Total Vat</td>
-                                    <td colspan="2" class="price" id="total_shipping">{{$arrayCurrency->icon}}{{$vat}}</td>
+                                    <td colspan="2" class="price" id="total_shipping">{{$arrayCurrency->icon}}<span id="shoppingVatTotal">{{$vat}}</span></td>
                                 </tr>
 
                                 <tr class="cart_total_voucher unvisible">
@@ -77,13 +80,13 @@
                                     <td colspan="3" class="total_price_container text-right"> <span>Total</span>
                                         <div class="hookDisplayProductPriceBlock-price"></div>
                                     </td>
-                                    <td colspan="2" class="price" id="total_price_container"> <span id="total_price">{{$arrayCurrency->icon}}{{$totalPrice}}</span></td>
+                                    <td colspan="2" class="price" id="total_price_container"> <span id="total_price">{{$arrayCurrency->icon}}<span id="cartTotalShop">{{$totalPrice}}</span></span></td>
                                 </tr>
                             </tfoot>
                             <tbody>
                                 @if(isset($product))
                                 @foreach($product as $pro)
-                                <tr id="product_3_13_0_0" class="cart_item last_item first_item address_0 odd">
+                                <tr id="product_3_13_0_0_{{$pro['item']->id}}" class="cart_item last_item first_item address_0 odd">
                                     <td class="cart_product">
                                         <a href=""><img src="{{url('upload/product')}}/{{$pro['item']->photo}}" alt="{{$pro['item']->name}}" width="110" height="140" /></a>
                                     </td>
@@ -98,7 +101,7 @@
                                         @if(!empty($pro['item']->unit))
                                             @if(isset($pro['unit']))
                                             <span class="text-success" style="color: #09f; font-weight: bolder; margin-top: 10px; clear: both; display:block;">Unit</span>
-                                            <select name="unit" id="unit">
+                                            <select name="unit" id="unit_name_{{$pro['item']->id}}">
                                                 <option value="">Select Unit</option>
                                                 @foreach(explode(',',$pro['item']->unit) as $ut)
                                                     <option 
@@ -115,7 +118,7 @@
                                         @if(!empty($productcolor))
                                         @if(isset($pro['color']))
                                         <span class="text-success" style="color: #09f; font-weight: bolder; margin-top: 10px; clear: both; display:block;">Color</span>
-                                        <select name="color" id="color">
+                                        <select name="color" id="color_name_{{$pro['item']->id}}">
                                             <option value="">Select Color</option>
                                             @foreach($productcolor as $col)
                                             <option 
@@ -130,22 +133,22 @@
                                          @endif
                                         @endif
                                     </td>
-                                    <td class="cart_unit" data-title="Unit price">
+                                    <td id="unit_price_{{$pro['item']->id}}" class="cart_unit" data-title="Unit price" data-price="{{$pro['item']->price}}">
                                         <ul class="price text-right" id="product_price_3_13_0">
                                             <li class="price">{{$arrayCurrency->icon}}{{$pro['item']->price}}</li>
                                         </ul>
                                     </td>
                                     <td class="cart_quantity text-center" data-title="Quantity">
                                         <input type="hidden" value="{{$pro['qty']}}" name="quantity_3_13_0_0_hidden" />
-                                        <input size="2" type="text" autocomplete="off" class="cart_quantity_input form-control grey" value="{{$pro['qty']}}" name="quantity_3_13_0_0" />
+                                        <input size="2" type="text" autocomplete="off" class="cart_quantity_input form-control grey" value="{{$pro['qty']}}" name="quantity_3_13_0_0_{{$pro['item']->id}}" />
                                         <div class="cart_quantity_button clearfix">
-                                            <a rel="nofollow" class="btn btn-default button-minus" href="javascript:cart_from_shopping_cart();" data-href="{{ route('product.delToCart',['id'=>$pro['item']->id]) }}" title="Subtract"> <span><i class="icon-minus"></i></span> </a> 
-                                            <a rel="nofollow" class="btn btn-default button-plus" href="javascript:cart_from_shopping_cart();"  data-href="{{ route('product.addToCart',['id'=>$pro['item']->id,'reur'=>base64_encode('shopping-cart')]) }}" title="Add"><span><i class="icon-plus"></i></span></a></div>
+                                            <a rel="nofollow" class="btn btn-default button-minus" href="javascript:cart_min_shopping_cart({{$pro['item']->id}});" data-href="{{ route('product.delToCart',['id'=>$pro['item']->id]) }}" title="Subtract"> <span><i class="icon-minus"></i></span> </a> 
+                                            <a rel="nofollow" class="btn btn-default button-plus" href="javascript:cart_plus_shopping_cart({{$pro['item']->id}});"  data-href="{{ route('product.addToCart',['id'=>$pro['item']->id,'reur'=>base64_encode('shopping-cart')]) }}" title="Add"><span><i class="icon-plus"></i></span></a></div>
                                     </td>
                                     <td class="cart_delete text-center" data-title="Delete">
                                         <div> <a rel="nofollow" title="Delete"  href="{{route('product.delRowCart',['id'=>$pro['item']->id])}}"><i class="icon-trash"></i></a></div>
                                     </td>
-                                    <td class="cart_total" data-title="Total"> <span class="price" id="total_product_price_3_13_0"> {{$arrayCurrency->icon}}{{$pro['price']}} </span></td>
+                                    <td class="cart_total cart_row_line_total" data-title="Total" data-row-total="{{$pro['price']}}"  id="total_product_price_linee_3_13_0_{{$pro['item']->id}}"> <span class="price" id="total_product_price_3_13_0"> {{$arrayCurrency->icon}}<span id="total_product_price_3_13_0_{{$pro['item']->id}}">{{$pro['price']}}</span> </span></td>
                                 </tr>
                                 @endforeach
                                 @endif
@@ -182,11 +185,175 @@
 @endsection
 
 @section('js')
+<script type="text/javascript" src="{{url('js/sweetalert.min.js')}}"></script>
 
 <script>
-    function cart_from_shopping_cart()
+
+    function cart_plus_shopping_cart(id)
     {
-        console.log('dddd');
+        var htmlStringPrice=$("#unit_price_"+id).attr('data-price');
+        var htmlStringqtn=$("input[name=quantity_3_13_0_0_"+id+"]").val();
+        
+        var htmlStringcolor='';
+        var htmlStringcolorStatus=false;
+        if ($("#color_name_"+id).length)
+        {
+            htmlStringcolorStatus=true;
+            var htmlStringcolor=$("#color_name_"+id).val();
+
+            if(htmlStringcolor=='')
+            {
+                swal("Warning !!!", "Please select a color.", "error");
+                return true;
+            }
+
+        }
+
+        var htmlStringunitStatus=false;
+        var htmlStringunit='';
+        if ($("#unit_name_"+id).length)
+        {
+            htmlStringunitStatus=true;
+            var htmlStringunit=$("#unit_name_"+id).val();
+            if(htmlStringunit=='')
+            {
+                swal("Warning !!!", "Please select a unit.", "error");
+                return true;
+            }
+        }
+
+        
+        
+        if(htmlStringcolorStatus==true && htmlStringunitStatus==true)
+        {
+            var baseUrl="<?=url('cart-new-add')?>";
+            $.get(baseUrl+'/'+id+'/1/'+htmlStringunit+'/'+htmlStringcolor,function(data){
+                console.log(htmlStringunit,htmlStringcolor,data);
+            });
+        }
+        else if(htmlStringcolorStatus==false && htmlStringunitStatus==true)
+        {
+            if(htmlStringunit=='')
+            {
+                swal("Warning !!!", "Please select a unit.", "error");
+                return true;
+            }
+            
+            var baseUrl="<?=url('cart-new-unit-add')?>";
+            $.get(baseUrl+'/'+id+'/1/'+htmlStringunit,function(data){
+                console.log(htmlStringunit,data);
+            });
+        }
+        else if(htmlStringcolorStatus==true && htmlStringunitStatus==false)
+        {
+            if(htmlStringcolor=='')
+            {
+                swal("Warning !!!", "Please select a color.", "error");
+                return true;
+            }
+            
+            var baseUrl="<?=url('cart-new-Color-add')?>";
+            $.get(baseUrl+'/'+id+'/1/'+htmlStringcolor,function(data){
+                console.log(htmlStringcolor,data);
+            });
+        }
+        else if(htmlStringcolorStatus==false && htmlStringunitStatus==false)
+        {
+            var baseUrl="<?=url('cart-new-add')?>";
+            $.get(baseUrl+'/'+id+'/1',function(data){
+                console.log(htmlStringcolor,data);
+            });
+        }
+
+        var newQTN=(htmlStringqtn-0)+(1-0);
+        var newQTNPrice=(newQTN*htmlStringPrice).toFixed(2);
+
+
+
+        $("input[name=quantity_3_13_0_0_"+id+"]").val(newQTN);
+        $("#total_product_price_3_13_0_"+id).html(newQTNPrice);
+        $("#total_product_price_linee_3_13_0_"+id).attr('data-row-total',newQTNPrice);
+        //console.log(newQTN);
+        //console.log(newQTNPrice);
+
+        var CartTableTotal=0;
+        $('td.cart_row_line_total').each(function(i)
+        {
+           //console.log('Ami in Loop',$(this).attr('data-row-total'));
+           CartTableTotal+=($(this).attr('data-row-total')-0);
+        });
+
+
+
+        var rTotal=CartTableTotal.toFixed(2);
+        $("#shoppingCartRawTotal").html(rTotal);
+        shoppingCartFinishTrans(rTotal);
+    }
+
+    function cart_min_shopping_cart(id)
+    {
+        var htmlStringPrice=$("#unit_price_"+id).attr('data-price');
+        var htmlStringqtn=$("input[name=quantity_3_13_0_0_"+id+"]").val();
+                
+        if(htmlStringqtn>1)
+        {
+            var baseUrl="<?=url('cart-new-del')?>";
+            $.get(baseUrl+'/'+id+'/1',function(data){
+                console.log(htmlStringcolor,data);
+            });
+        }       
+
+        var newQTN=htmlStringqtn-1;
+        if(newQTN<=1)
+        {
+            newQTN=1;
+        }
+        var newQTNPrice=(newQTN*htmlStringPrice).toFixed(2);
+
+        $("input[name=quantity_3_13_0_0_"+id+"]").val(newQTN);
+        $("#total_product_price_3_13_0_"+id).html(newQTNPrice);
+        $("#total_product_price_linee_3_13_0_"+id).attr('data-row-total',newQTNPrice);
+        console.log(newQTN);
+        console.log(newQTNPrice);
+
+        var CartTableTotal=0;
+        $('td.cart_row_line_total').each(function(i)
+        {
+           console.log('Ami in Loop',$(this).attr('data-row-total'));
+           CartTableTotal+=($(this).attr('data-row-total')-0);
+        });
+
+        var rTotal=CartTableTotal.toFixed(2);
+        $("#shoppingCartRawTotal").html(rTotal);
+        shoppingCartFinishTrans(rTotal);
+
+    }
+
+
+    function shoppingCartFinishTrans(totalS)
+    {
+
+        var vat=eval(eval(totalS*20)/100).toFixed(2);
+
+        $("#shoppingVatTotal").html(vat);
+        var DeliveryExtra=0;
+
+        var deliverychargeLimit=150;
+
+        if(deliverychargeLimit<=totalS)
+        {
+            var DeliveryExtra=9.95; 
+            $("#extraShippingCharge").html(DeliveryExtra); 
+        }
+        else
+        {
+            var DeliveryExtra=0;   
+            $("#extraShippingCharge").html("0.00");
+        }
+
+        var cartTotalShop=((totalS-0)+(vat-0)+(DeliveryExtra-0)).toFixed(2);
+        $("#cartTotalShop").html(cartTotalShop);
+
     }
 </script>
 <script type="text/javascript">

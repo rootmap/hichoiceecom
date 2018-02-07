@@ -49,7 +49,7 @@ class Cart {
         $this->totalPrice += $item->price;
     }
     
-    public function addCustomWU($item, $id,$color) {
+    public function addCustomWC($item, $id,$color) {
         $storeditem = ['color' => 0,'qty' => 0, 'price' => $item->price, 'item' => $item];
         if ($this->items) {
             if (array_key_exists($id, $this->items)) {
@@ -59,6 +59,24 @@ class Cart {
         $storeditem['qty'] ++;
         
         $storeditem['color']=$color;
+
+        
+        $storeditem['price'] = $item->price * $storeditem['qty'];
+        $this->items[$id] = $storeditem;
+        $this->totalQty++;
+        $this->totalPrice += $item->price;
+    }
+
+    public function addCustomWU($item, $id,$unit) {
+        $storeditem = ['unit' => 0,'qty' => 0, 'price' => $item->price, 'item' => $item];
+        if ($this->items) {
+            if (array_key_exists($id, $this->items)) {
+                $storeditem = $this->items[$id];
+            }
+        }
+        $storeditem['qty'] ++;
+        
+        $storeditem['unit']=$unit;
 
         
         $storeditem['price'] = $item->price * $storeditem['qty'];

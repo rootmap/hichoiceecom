@@ -2,6 +2,7 @@
 $arrayDD=MenuPageController::siteBasic();
 $arrayCurrency=MenuPageController::CurrencyDetail();
 ?>
+<script type="text/javascript" src="{{url('js/sweetalert.min.js')}}"></script>
 <script>
 
     var CUSTOMIZE_TEXTFIELD = 1;
@@ -241,8 +242,8 @@ $arrayCurrency=MenuPageController::CurrencyDetail();
 
             if (color == '')
             {
-                alert('Please Select A Color');
-                return false;
+                swal("Warning !!!", "Please select a color.", "error");
+                return true;
             }
             
             if (color === undefined)
@@ -252,8 +253,8 @@ $arrayCurrency=MenuPageController::CurrencyDetail();
 
             if (unit == '')
             {
-                alert('Please Select A Unit');
-                return false;
+                swal("Warning !!!", "Please select a unit.", "error");
+                return true;
             }
 
             if (unit === undefined) {
@@ -372,8 +373,8 @@ $arrayCurrency=MenuPageController::CurrencyDetail();
 
             if (color == '')
             {
-                alert('Please Select A Color');
-                return false;
+                swal("Warning !!!", "Please select a color.", "error");
+                return true;
             }
             
             if (color === undefined)
@@ -392,7 +393,7 @@ $arrayCurrency=MenuPageController::CurrencyDetail();
             
             if(qty==0)
             {
-                alert('Please Type Your Quantity.');
+                swal("Warning !!!", "Please type a quantity.", "error");
                 return true;
             }
             

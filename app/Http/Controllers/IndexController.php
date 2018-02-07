@@ -333,7 +333,7 @@ class IndexController extends Controller {
         }
     }
 
-    public function cartAddFromProductCustomWU(Request $request, $pid = 0, $quantity = 0, $color = 0) {
+    public function cartAddFromProductCustomWC(Request $request, $pid = 0, $quantity = 0, $color = 0) {
         $product = Product::find($pid);
 
         //echo $request->qty;
@@ -342,7 +342,33 @@ class IndexController extends Controller {
             for ($i = 1; $i <= $quantity; $i++) {
                 $oldCart = Session::has('cart') ? Session::get('cart') : null;
                 $cart = new Cart($oldCart);
-                $cart->addCustomWU($product, $product->id, $color);
+                $cart->addCustomWC($product, $product->id, $color);
+
+                $request->session()->put('cart', $cart);
+            }
+
+            $request->session()->put('cart', $cart);
+            //dd($request->session()->get('cart'));
+            //return $reur;
+            //exit();
+            return response()->json($cart);
+            //echo $request->reur;
+            //exit();
+        } else {
+            return 0;
+        }
+    }
+
+    public function cartAddFromProductCustomWU(Request $request, $pid = 0, $quantity = 0, $unit = 0) {
+        $product = Product::find($pid);
+
+        //echo $request->qty;
+
+        if (!empty($quantity)) {
+            for ($i = 1; $i <= $quantity; $i++) {
+                $oldCart = Session::has('cart') ? Session::get('cart') : null;
+                $cart = new Cart($oldCart);
+                $cart->addCustomWU($product, $product->id, $unit);
 
                 $request->session()->put('cart', $cart);
             }
@@ -2168,6 +2194,7 @@ class IndexController extends Controller {
                 ->select('products.*', 'c.name as cat_name', 'sc.name as scat_name', 'put.name as put_name')
                 ->where('products.id', '=', $pid)
                 ->get();
+
         $productCategoryInfo = array();
         if (isset($product)) {
             $cidProduct = $product[0]->cid;
@@ -2200,6 +2227,7 @@ class IndexController extends Controller {
                     ->join('product_colors', 'color_in_products.color_id', '=', 'product_colors.id')
                     ->select('product_colors.id', 'product_colors.name')
                     ->where('color_in_products.pid', $pid)
+                    ->groupby('color_in_products.color_id')
                     ->get();
         }
 
