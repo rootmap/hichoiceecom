@@ -16,7 +16,15 @@
                        
                         
                     </div>
-                    @if($categoryInfo->layout==1)
+                    @if($categoryInfo->layout==1 && !empty($selectedBID->layout))
+                        @if($selectedBID->layout==1)
+                            @include('front-include.catbanall')
+                        @elseif($selectedBID->layout==2)
+                            @include('front-include.branCat')
+                        @else
+                            @include('front-include.branCat')
+                        @endif
+                    @elseif($categoryInfo->layout==1 && empty($selectedBID->layout))
                         @include('front-include.branCat')
                     @elseif($categoryInfo->layout==2)
                         @include('front-include.branCat')

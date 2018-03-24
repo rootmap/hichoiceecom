@@ -1,3 +1,6 @@
+<?php 
+$arrayCurrency=MenuPageController::CurrencyDetail();
+?>
 <div id="center_column" class="center_column col-xs-12 col-sm-12 col-md-9">
     
     <h1 class="page-heading title_font"><span class="cat-name">{{$brand->name}}&nbsp;</span><span class="heading-counter">There are <?=count($product)?> products.</span></h1>
@@ -85,7 +88,7 @@
                             <div class="price-rating">
 
                                 <div class="content_price" itemprop="offers" itemscope itemtype=""> 
-                                    <span itemprop="price" class="price product-price"> ${{$pro->price}} </span>
+                                    <span itemprop="price" class="price product-price"> {{$arrayCurrency->icon}}{{$pro->price}} </span>
                                     <meta itemprop="priceCurrency" content="USD" /> 
 <!--                                                        <span class="old-price product-price"> $20.50 </span> 
                                     <span class="price-percent-reduction">-20%</span> 

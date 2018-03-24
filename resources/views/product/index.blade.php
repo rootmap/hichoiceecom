@@ -29,7 +29,47 @@ Products Info
             <!-- form start -->
             <form role="form">
                 <div class="box-body">                
-                    <div id="grid"></div>
+                    <div class="table-responsive">
+                        
+                        <table  class="display example" cellspacing="0" width="100%">
+                          <thead>
+                            <tr>
+                              <th>P.ID</th>
+                              <th>Code</th>
+                              <th width="100">Name</th>
+                              <th>Image</th>
+                              <th>Price</th>
+                              <th>Category</th>
+                              <th>Sub-Category</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @if(isset($dataTable))
+                                @foreach($dataTable as $row)
+                                <tr id="pid_{{$row->id}}">
+                                  <td>{{$row->id}}</td>
+                                  <td>{{$row->pcode}}</td>
+                                  <td>{{$row->name}}</td>
+                                  <td><img width='50' src='<?= url('upload/product/'.$row->photo)?>'></td>
+                                  <td>{{$row->price}}</td>
+                                  <td>{{$row->cname}}</td>
+                                  <td>{{$row->scname}}</td>
+                                  <td>
+                                    <a class="btn btn-info btn-sm" href="{{url('admin-ecom/product/'.$row->id)}}"><i class="fa fa-edit"></i></a> 
+                                    <a class="btn btn-danger btn-sm" onclick="javascript:deleteClick(<?=$row->id?>);" ><i class="fa fa-trash"></i></a>
+                                    </td>
+                               </tr>
+                               @endforeach
+                           @endif
+                        </tbody>
+                        </table>
+
+
+
+
+
+                    </div>
 
                 </div>
                 <!-- /.box-body -->
@@ -47,15 +87,34 @@ Products Info
 
 
 @section('js')
-@include('extra.kendo')
 
+  <script src="{{url('datatable-lib/draw-table/jquery-ui/js/jquery-ui.min.js?v=v1.2.3')}}"></script>
+  <link rel="stylesheet" href="{{url('datatable-lib/draw-table/tablednd.css')}}" type="text/css"/>
 
-<script id="edit_client" type="text/x-kendo-template">
-    <a class="k-button k-button-icontext k-grid-delete" href="{{url('admin-ecom/product')}}/#= id #"><span class="k-icon k-edit"></span>Edit</a> 
-    <a class="k-button k-button-icontext k-grid-delete" onclick="javascript:deleteClick(#= id #);" ><span class="k-icon k-delete"></span>Delete</a>
-</script>  
+  
+<style type="text/css">
+
+tr > td
+{
+    font-size: 11px;
+        padding: 5px 0px !important;
+}
+tr{
+  cursor: move;
+}
+table.dataTable thead th,table.dataTable thead td{ font-size: smaller;  }
+</style>
 <script type="text/javascript">
-    function deleteClick(id) {
+  $(document).ready(function() {
+    $('.example').DataTable( {
+      "scrollX": true,
+      "order":false,
+      "aLengthMenu": [[25, 50, 75, -1], [25, 50, 75, "All"]],
+      "pageLength": 25
+    });
+  });
+
+function deleteClick(id) {
         var c = confirm("Do you want to delete?");
         if (c === true) {
             $.ajax({
@@ -63,86 +122,40 @@ Products Info
                 dataType: "json",
                 url: "product-delete/" + id,
                 success: function (result) {
-                    $(".k-i-refresh").click();
+                    $("#id_"+id).fadeOut('slow');
                 }
             });
         }
-    }
-
+}
 </script>
 
-<script type="text/javascript">
-    $(document).ready(function () {
 
+<script language = "Javascript">
+  $(document).ready(function(){
 
+    $(function() {
 
-        var dataSource = new kendo.data.DataSource({
-            transport: {
-                read: {
-                    url: "product-data",
-                    type: "GET",
-                    datatype: "JSON"
-
-                }
-            },
-            autoSync: false,
-            schema: {
-                data: "data",
-                total: "data.length",
-                model: {
-                    id: "id",
-                    fields: {
-                        id: {nullable: true},
-                        pcode: {type: "string"},
-                        name: {type: "string"},
-                        price: {type: "string"},
-                        photo: {type: "string"},
-                        cname: {type: "string"},
-                        scname: {type: "string"},
-                        bname: {type: "string"},
-                        isactive: {type: "string"},
-                        created_at: {type: "string"},
-                        updated_at: {type: "string"}
-
-                    }
-                }
-            },
-            pageSize: 10,
-            serverPaging: false,
-            serverFiltering: false,
-            serverSorting: false
-        });
-        $("#grid").kendoGrid({
-            dataSource: dataSource,
-            filterable: true,
-            pageable: {
-                refresh: true,
-                input: true,
-                numeric: false,
-                pageSizes: true,
-                pageSizes: [10, 20, 50, 100, 200, 400]
-            },
-            sortable: true,
-            groupable: true,
-            columns: [
-                {field: "id", title: "BID", width: "80px"},
-                {field: "pcode", title: "Code"},
-                {field: "name", title: "Name"},
-                {template: "<img width='100' src='<?= url('upload/product') ?>/#=photo#'>", title: "Image"},
-                {field: "price", title: "Price"},
-                {field: "cname", title: "Category"},
-                {field: "scname", title: "Sub-Category"},
-                {field: "bname", title: "Brand"},
-                {field: "isactive", title: "Is Active"},
-                //{template: kendo.toString("#=created_at#", "dd/MM/yyyy"), title: "Created", width: "150px"},
-                {
-                    title: "Action", width: "170px",
-                    template: kendo.template($("#edit_client").html())
-                }
-            ],
-        });
+      $('table').sortable({
+        items: 'tr',
+        opacity: 0.6,
+        axis: 'y',
+        stop: function (event, ui) {
+          var data = $(this).sortable('serialize');
+          $.ajax({
+           data: {data,'_token':'<?=csrf_token()?>'},
+           type: 'POST',
+           url: 'product-reorder'
+         });
+        }
+      });
     });
 
+  });
+
+
 </script>
 
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+  <script src='https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js' type="text/javascript"></script>
+  <script src="{{url('datatable-lib/draw-table/js/jquery.tablednd.js')}}" type="text/javascript"></script>
 @endsection

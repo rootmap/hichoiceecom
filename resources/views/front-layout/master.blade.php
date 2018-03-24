@@ -50,21 +50,7 @@
                     <div class="row">
 
                         <div class="container"></div>
-
-
                         @yield('content')
-
-
-
-
-
-
-
-
-
-
-
-
                     </div>
                 </div>
             </div>

@@ -1,3 +1,6 @@
+<?php 
+$arrayCurrency=MenuPageController::CurrencyDetail();
+?>
 <?php $product_info=$product; ?>
 <div id="center_column" class="center_column col-xs-12 col-sm-12 col-md-9">
     <div class="content_scene_cat">
@@ -32,15 +35,6 @@
                             <div class="product-flags"></div>
                         </div>
                         
-                       {{--
-                       DB_CONNECTION=mysql
-                        DB_HOST=127.0.0.1
-                        DB_PORT=3306
-                        DB_DATABASE=spxce_ecom
-                        DB_USERNAME=spxce_ecom
-                        DB_PASSWORD=c]N$0LBu#^?y
-                       --}}
-                        
                         @if(!empty($pro->unit))
                             <?php 
                             $unitArray= explode(",", $pro->unit);
@@ -50,6 +44,7 @@
                             <?php $color=count($pro->iscolor); ?>
                             <span style="border: 5px #808080 solid; background:#454545; opacity: 0.5; font-weight: bolder; font-size:18px; color: #fff; border-radius: 50px; bottom:80px; right: 0; padding-top:10px; padding-bottom:10px; padding-left:12px; padding-right:12px; position: absolute; z-index: 999;"><?=$color?></span>
                         @endif            
+                        
                         <div class="right-block">
                             <h5 itemprop="name"> 
                                 <a class="product-name" href="{{url('product')}}/{{$pro->id}}/{{$pro->name}}" title="{{$pro->name}}" itemprop="url"  style="overflow: hidden; line-height: 40px; height: 40px;"> {{$pro->name}} </a></h5>
@@ -58,7 +53,7 @@
                             <div class="price-rating">
                                  @if(empty($pro->unit))
                                     <div class="content_price" itemprop="offers" itemscope itemtype=""> 
-                                        <span itemprop="price" class="price product-price"> ${{$pro->price}} </span>
+                                        <span itemprop="price" class="price product-price"> {{$arrayCurrency->icon}}{{$pro->price}} </span>
                                         <meta itemprop="priceCurrency" content="USD" /> 
     <!--                                                        <span class="old-price product-price"> $20.50 </span> 
                                         <span class="price-percent-reduction">-20%</span> 

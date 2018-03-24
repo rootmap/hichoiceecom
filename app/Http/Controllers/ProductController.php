@@ -25,7 +25,15 @@ class ProductController extends Controller {
      * @return Response
      */
     public function index() {
-        return view('product.index');
+        $json = DB::table('products as p')
+                ->leftjoin('categories as c', 'p.cid', '=', 'c.id')
+                ->leftjoin('sub_categories as sc', 'p.scid', '=', 'sc.id')
+                ->leftjoin('brands as b', 'p.bid', '=', 'b.id')
+                ->select('p.*', 'c.name as cname', 'sc.name as scname', 'b.name as bname')
+                ->where('p.multi_product', 0)
+                ->orderBy('p.position', 'ASC')
+                ->get();
+        return view('product.index',['dataTable'=>$json]);
     }
 
     /**
@@ -45,6 +53,42 @@ class ProductController extends Controller {
     public function filtersubcat(Request $request) {
         $query = DB::table('sub_categories')->where('category_id', $request->cid)->get();
         return response()->json($query);
+    }
+
+    public function productreorder(Product $product,Request $request)
+    {
+        $postArray=explode('&',$request->data);
+        $totalPost=count($postArray);
+        if($totalPost!=0)
+        {
+            $product::where('position','0')->update(['position'=>3000]);
+            $lastPositionSQL=$product::where('position','!=',3000)
+                                        ->select('position')
+                                        ->orderBy('position','DESC')
+                                        ->first();
+            $lastPosition=0;                            
+            if(isset($lastPositionSQL))
+            {
+                $lastPosition=(int)($lastPositionSQL->position+1);
+            }
+            else
+            {
+                $lastPosition=1;
+            }
+            foreach($postArray as $key=>$row):
+                $pid=str_replace('pid[]=','',$row);
+                if(!empty($pid))
+                {
+                    $product::where('id',$pid)->update(['position'=>($key+$lastPosition)]);
+                }
+            endforeach;  
+            return $totalPost;
+        }
+        else
+        {
+            return 0;
+        }  
+
     }
 
     /**

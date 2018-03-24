@@ -645,6 +645,7 @@ class IndexController extends Controller {
                     ->where('products.bid', $bid)
                     ->where('products.scid', 0)
                     ->where('products.sscid', 0)
+                    ->where('products.multi_product', 0)
                     ->when($filter, function($query) use ($filter){
                         if($filter=='id-desc'){ return $query->orderby('id','desc'); }
                         elseif($filter=='price:asc'){ return $query->orderby('price','asc'); }
@@ -857,18 +858,91 @@ class IndexController extends Controller {
         //$categoryInfo=Category::find($cid);
         $product = Product::where('bid', $id)->get();
         //$cat_info = SubCategory::find($cid);
-        
+        $selectedBID=Brand::find($id);
         $categoryInfo=Category::find($cid);
        
-        
-        $product_info = DB::table('products')
+        if($categoryInfo->layout==1 && !empty($selectedBID->layout))
+        {
+            if($selectedBID->layout==1)
+            {
+                $filter=$this->GenaratePageDataFilter();
+            $product_info = DB::table('products')
+                            ->where('bid', $id)
+                            ->where('cid', $cid)
+                            ->where('parent_product', '0')
+                            ->where('scid', '0')
+                            ->where('sscid', '0')
+                            ->select('products.*')
+                            ->groupBy('products.id')
+                            ->when($filter, function($query) use ($filter){
+                                if($filter=='id-desc'){ return $query->orderby('id','desc'); }
+                                elseif($filter=='price:asc'){ return $query->orderby('price','asc'); }
+                                elseif($filter=='price:desc'){ return $query->orderby('price','desc'); }
+                                elseif($filter=='name:asc'){ return $query->orderby('name','asc'); }
+                                elseif($filter=='name:desc'){ return $query->orderby('name','desc'); }
+                                elseif($filter=='quantity:desc'){ return $query->orderby('quantity','desc'); }
+                                elseif($filter=='position:asc'){ return $query->orderby('id','desc'); }
+                                else{ return $query->orderby('id','desc'); }                    
+                            })
+                            ->paginate($this->GenaratePageDataLimit());
+            }   
+            elseif($selectedBID->layout==2)
+            {
+                $product_info = DB::table('products')
                 ->join('sub_categories', 'products.scid', '=', 'sub_categories.id')
                 ->where('bid', $id)
                 ->where('cid', $cid)
                 ->select('sub_categories.*')
                 ->groupBy('sub_categories.id')
                 ->get();
+            }
+            else
+            {
+                $filter=$this->GenaratePageDataFilter();
+                $product_info = DB::table('products')
+                            ->where('bid', $id)
+                            ->where('cid', $cid)
+                            ->where('parent_product', '0')
+                            ->where('scid', '0')
+                            ->where('sscid', '0')
+                            ->select('products.*')
+                            ->groupBy('products.id')
+                            ->when($filter, function($query) use ($filter){
+                                if($filter=='id-desc'){ return $query->orderby('id','desc'); }
+                                elseif($filter=='price:asc'){ return $query->orderby('price','asc'); }
+                                elseif($filter=='price:desc'){ return $query->orderby('price','desc'); }
+                                elseif($filter=='name:asc'){ return $query->orderby('name','asc'); }
+                                elseif($filter=='name:desc'){ return $query->orderby('name','desc'); }
+                                elseif($filter=='quantity:desc'){ return $query->orderby('quantity','desc'); }
+                                elseif($filter=='position:asc'){ return $query->orderby('id','desc'); }
+                                else{ return $query->orderby('id','desc'); }                    
+                            })
+                            ->paginate($this->GenaratePageDataLimit());
+            }
+        }
+        elseif($categoryInfo->layout==1 && empty($selectedBID->layout))
+        {
+            $product_info = DB::table('products')
+                ->join('sub_categories', 'products.scid', '=', 'sub_categories.id')
+                ->where('bid', $id)
+                ->where('cid', $cid)
+                ->select('sub_categories.*')
+                ->groupBy('sub_categories.id')
+                ->get();
+        }
+        else
+        {
+            $product_info = DB::table('products')
+                ->join('sub_categories', 'products.scid', '=', 'sub_categories.id')
+                ->where('bid', $id)
+                ->where('cid', $cid)
+                ->select('sub_categories.*')
+                ->groupBy('sub_categories.id')
+                ->get();
+        }
         
+
+
         
 
         //echo "<pre>";
@@ -904,6 +978,7 @@ class IndexController extends Controller {
             'cid' => $cid,
             'cats' => $cats,
             'product' => $product,
+            'selectedBID' => $selectedBID,
             'categoryInfo' => $categoryInfo,
             'brand' => $brand_info,
             'products' => $cart->items,

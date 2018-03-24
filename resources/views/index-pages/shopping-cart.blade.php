@@ -38,49 +38,57 @@
                                         </p>
                                     </td>
                                     <td colspan="3" class="text-right">Total products</td>
-                                    <td colspan="2" class="price" id="total_product">{{$arrayCurrency->icon}}<span id="shoppingCartRawTotal">{{$totalPrice}}</span></td>
+                                    <td colspan="2" class="price" id="total_product" style="color: #000;">{{$arrayCurrency->icon}}<span id="shoppingCartRawTotal"><?=number_format($totalPrice,2)?></span></td>
                                 </tr>
                                 <tr style="display: none;">
                                     <td colspan="3" class="text-right"> Total gift-wrapping cost</td>
-                                    <td colspan="2" class="price-discount price" id="total_wrapping"> {{$arrayCurrency->icon}}0.00</td>
+                                    <td colspan="2" class="price-discount price" id="total_wrapping" style="color: #000;"> {{$arrayCurrency->icon}}0.00</td>
                                 </tr>
 
-                                <?php 
-                                $vat=($totalPrice*20)/100;
-                                ?>
+                               
 
                                 
                                     <tr class="cart_total_delivery" id="underTotalcost_delivery">
                                         <td colspan="3" class="text-right">Extra Shipping Charge</td>
-                                        <td colspan="2" class="price" id="total_shipping">
+                                        <td colspan="2" class="price" id="total_shipping" style="color: #000;">
                                             {{$arrayCurrency->icon}}<span id="extraShippingCharge"><?php 
                                             if($totalPrice<150)
                                             {
                                                 echo 9.95;
+                                                $totalPrice+=9.95; 
+                                            }
+                                            else
+                                            {
+                                                echo 0;
                                             }
                                             
-                                            $totalPrice+=9.95; 
                                             ?></span>
                                             
                                     </td>
                                     </tr>
 
+                                <?php 
+                                $vat=number_format((($totalPrice*20)/100),2);
+                                ?>
+
                                 <?php $totalPrice+=$vat; ?>
+
+
 
                                 <tr class="cart_total_delivery">
                                     <td colspan="3" class="text-right">Total Vat</td>
-                                    <td colspan="2" class="price" id="total_shipping">{{$arrayCurrency->icon}}<span id="shoppingVatTotal">{{$vat}}</span></td>
+                                    <td colspan="2" class="price" id="total_shipping" style="color: #000;">{{$arrayCurrency->icon}}<span id="shoppingVatTotal">{{$vat}}</span></td>
                                 </tr>
 
                                 <tr class="cart_total_voucher unvisible">
                                     <td colspan="3" class="text-right"> Total vouchers</td>
-                                    <td colspan="2" class="price-discount price" id="total_discount"> {{$arrayCurrency->icon}}0.00</td>
+                                    <td colspan="2" class="price-discount price" id="total_discount" style="color: #000;"> {{$arrayCurrency->icon}}0.00</td>
                                 </tr>
                                 <tr class="cart_total_price">
                                     <td colspan="3" class="total_price_container text-right"> <span>Total</span>
                                         <div class="hookDisplayProductPriceBlock-price"></div>
                                     </td>
-                                    <td colspan="2" class="price" id="total_price_container"> <span id="total_price">{{$arrayCurrency->icon}}<span id="cartTotalShop">{{$totalPrice}}</span></span></td>
+                                    <td colspan="2" class="price" id="total_price_container" style="color: #000;"> <span id="total_price">{{$arrayCurrency->icon}}<span id="cartTotalShop"><?=number_format($totalPrice,2)?></span></span></td>
                                 </tr>
                             </tfoot>
                             <tbody>
@@ -133,9 +141,9 @@
                                          @endif
                                         @endif
                                     </td>
-                                    <td id="unit_price_{{$pro['item']->id}}" class="cart_unit" data-title="Unit price" data-price="{{$pro['item']->price}}">
+                                    <td id="unit_price_{{$pro['item']->id}}" class="cart_unit" data-title="Unit price" data-price="{{$pro['item']->price}}" style="color: #000;">
                                         <ul class="price text-right" id="product_price_3_13_0">
-                                            <li class="price">{{$arrayCurrency->icon}}{{$pro['item']->price}}</li>
+                                            <li class="price" style="color: #000;">{{$arrayCurrency->icon}}{{$pro['item']->price}}</li>
                                         </ul>
                                     </td>
                                     <td class="cart_quantity text-center" data-title="Quantity">
@@ -148,7 +156,7 @@
                                     <td class="cart_delete text-center" data-title="Delete">
                                         <div> <a rel="nofollow" title="Delete"  href="{{route('product.delRowCart',['id'=>$pro['item']->id])}}"><i class="icon-trash"></i></a></div>
                                     </td>
-                                    <td class="cart_total cart_row_line_total" data-title="Total" data-row-total="{{$pro['price']}}"  id="total_product_price_linee_3_13_0_{{$pro['item']->id}}"> <span class="price" id="total_product_price_3_13_0"> {{$arrayCurrency->icon}}<span id="total_product_price_3_13_0_{{$pro['item']->id}}">{{$pro['price']}}</span> </span></td>
+                                    <td class="cart_total cart_row_line_total" data-title="Total" data-row-total="{{$pro['price']}}"  id="total_product_price_linee_3_13_0_{{$pro['item']->id}}"> <span class="price" id="total_product_price_3_13_0" style="color: #000;"> {{$arrayCurrency->icon}}<span id="total_product_price_3_13_0_{{$pro['item']->id}}">{{$pro['price']}}</span> </span></td>
                                 </tr>
                                 @endforeach
                                 @endif
@@ -332,15 +340,11 @@
 
     function shoppingCartFinishTrans(totalS)
     {
-
-        var vat=eval(eval(totalS*20)/100).toFixed(2);
-
-        $("#shoppingVatTotal").html(vat);
         var DeliveryExtra=0;
 
         var deliverychargeLimit=150;
 
-        if(deliverychargeLimit<=totalS)
+        if(deliverychargeLimit>totalS)
         {
             var DeliveryExtra=9.95; 
             $("#extraShippingCharge").html(DeliveryExtra); 
@@ -350,6 +354,11 @@
             var DeliveryExtra=0;   
             $("#extraShippingCharge").html("0.00");
         }
+
+        var totalwithVat=((totalS-0)+(DeliveryExtra-0)).toFixed(2);
+
+         var vat=eval(eval(totalwithVat*20)/100).toFixed(2);
+         $("#shoppingVatTotal").html(vat);
 
         var cartTotalShop=((totalS-0)+(vat-0)+(DeliveryExtra-0)).toFixed(2);
         $("#cartTotalShop").html(cartTotalShop);

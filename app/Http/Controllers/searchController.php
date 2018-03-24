@@ -72,7 +72,7 @@ class searchController extends Controller {
 
     }
 
-    public function searchProduct($catpage = 0, $search = '', $limit = 9, $curpage = 1,$orderby="price:desc",$param1='',$param2='',$param3='',$param4='',$param5='',$param6='') {
+    public function searchProduct($catpage = 0, $search = '', $limit = 9, $curpage = 1,$orderby="price:desc",$param1='',$param2='',$param3='',$param4='',$param5='',$param6='') { 
         $language = Language::all();
         $currency = Currency::all();
         $cs = CustomerSupport::all();
@@ -83,8 +83,10 @@ class searchController extends Controller {
         $seo = Seo::all();
         $product = Product::all();
         $filter=$this->GenaratePageDataFilter();
-        $searchfound = Product::where('name', 'LIKE', '%' . $search . '%')->count();
-        $product_info = Product::where('name', 'LIKE', '%' . $search . '%')
+        
+        
+        $searchfound = Product::where('name', 'LIKE', '%' . $search . '%')->where('pcode', 'LIKE', '%' . $search . '%')->count();
+        $product_info = Product::where('name', 'LIKE', '%' . $search . '%')->orWhere('pcode', 'LIKE', '%' . $search . '%')
                         ->when($filter, function($query) use ($filter){
                             if($filter=='id-desc'){ return $query->orderby('id','desc'); }
                             elseif($filter=='price:asc'){ return $query->orderby('price','asc'); }
@@ -96,6 +98,9 @@ class searchController extends Controller {
                             else{ return $query->orderby('id','desc'); }                    
                         })
                         ->paginate($this->GenaratePageDataLimit());
+                        
+        //dd($product_info);               
+                        
         $orderarray= 0;
         //print_r($orderarray);
         //exit();

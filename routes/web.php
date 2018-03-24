@@ -302,6 +302,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('admin-ecom/new-product','ProductController@create');
         Route::post('admin-ecom/product-add','ProductController@store');
         Route::post('admin-ecom/product-update','ProductController@update');
+        Route::post('admin-ecom/product-reorder','ProductController@productreorder');
         Route::get('admin-ecom/product/{id}','ProductController@show');
 
         //Product-Tag
@@ -366,7 +367,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('admin-ecom/sub-category-data','SubCategoryController@showjson');
         Route::get('admin-ecom/sub-category-delete/{id}','SubCategoryController@destroy');
         
-        //sub-category
+        //sub-sub-category
         Route::get('admin-ecom/sub-sub-category-data','SubSubCategoryController@showjson');
         Route::post('admin-ecom/sub-sub-category-data/sub-category','SubSubCategoryController@showjsonSubCategory');
         Route::get('admin-ecom/sub-sub-category-delete/{id}','SubSubCategoryController@destroy');
